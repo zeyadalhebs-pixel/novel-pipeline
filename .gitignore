@@ -1,0 +1,13 @@
+# Security
+.env
+
+# Database
+novel.db
+*.sqlite3
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# OS Files
+.DS_Store

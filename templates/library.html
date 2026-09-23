@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="oled">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>مكتبة الروايات الخاصة بي</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root[data-theme="oled"] {
+            --bg: #000000;
+            --surface: #111111;
+            --surface-hover: #1a1a1a;
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+            --border: #222222;
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.15);
+            --badge-bg: #2563eb;
+            --badge-text: #ffffff;
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #18191a;
+            --surface: #242526;
+            --surface-hover: #3a3b3c;
+            --text-main: #e4e6eb;
+            --text-sub: #b0b3b8;
+            --border: #333333;
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.12);
+            --badge-bg: #2563eb;
+            --badge-text: #ffffff;
+        }
+
+        :root[data-theme="light"] {
+            --bg: #fdfbf7;
+            --surface: #f3ede2;
+            --surface-hover: #eae1d2;
+            --text-main: #1f2937;
+            --text-sub: #4b5563;
+            --border: #e5ded0;
+            --accent: #d97706;
+            --accent-glow: rgba(217, 119, 6, 0.15);
+            --badge-bg: #1d4ed8;
+            --badge-text: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            padding: 30px 20px 80px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        .shelf-container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .novel-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+        }
+
+        .novel-card:active {
+            transform: scale(0.98);
+        }
+
+        .novel-card:hover {
+            border-color: var(--accent);
+            background-color: var(--surface-hover);
+        }
+
+        .novel-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .novel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .novel-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .chapter-badge {
+            background-color: var(--accent-glow);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .resume-badge {
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .arrow-icon {
+            font-size: 20px;
+            color: var(--accent);
+            font-weight: bold;
+            padding-right: 10px;
+        }
+
+        .empty-shelf {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-sub);
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 مكتبة الروايات</h1>
+        <p>قائمة الروايات المحفوظة محلياً</p>
+    </header>
+
+    <main class="shelf-container">
+        {{ novel_cards }}
+    </main>
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('novel_theme') || 'oled';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            // Populate last-read pointer on cards
+            document.querySelectorAll('.novel-card').forEach(card => {
+                const novelId = card.getAttribute('data-novel-id');
+                const lastRead = localStorage.getItem('last_read_' + novelId);
+                
+                if (lastRead) {
+                    card.href = `/novel/${novelId}/chapter/${lastRead}`;
+                    const metaRow = card.querySelector('.novel-meta');
+                    if (metaRow) {
+                        const badge = document.createElement('span');
+                        badge.className = 'resume-badge';
+                        badge.innerText = `📌 متابعة: الفصل ${lastRead}`;
+                        metaRow.prepend(badge);
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
