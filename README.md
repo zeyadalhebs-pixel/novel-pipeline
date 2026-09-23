@@ -19,5 +19,5 @@ An end-to-end automated pipeline that scrapes web novel chapters, translates the
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/yourusername/novel-pipeline.git](https://github.com/yourusername/novel-pipeline.git)
+   git clone [https://github.com/zeyadalhebs-pixel/novel-pipeline.git](https://github.com/zeyadalhebs-pixel/novel-pipeline.git)
    cd novel-pipeline
